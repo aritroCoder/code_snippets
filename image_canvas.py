@@ -34,15 +34,11 @@ parser.add_argument('--output', '-o', default='random_walk.png',
                     help='Output filename (default: random_walk.png)')
 args = parser.parse_args()
 
-# Get settings from preset
 preset = PRESETS[args.resolution]
 width, height = preset['width'], preset['height']
 n_steps = preset['steps']
 
 print(f"Generating {width}x{height} image with {n_steps:,} steps...")
-
-# Canvas size
-width, height = 1920, 1080  # Higher resolution (or try 2560, 1440 for 2K, or 3840, 2160 for 4K)
 
 # Initialize canvas
 canvas = np.zeros((height, width, 3), dtype=np.uint8)
@@ -51,19 +47,15 @@ canvas = np.zeros((height, width, 3), dtype=np.uint8)
 x, y = width // 2, height // 2
 r, g, b = 128, 128, 128
 
-# Random walk - vectorized in batches
-batch_size = 10_000_000  # Larger batches for JIT
+batch_size = 10_000_000
 
 for i in tqdm(range(0, n_steps, batch_size), desc="Random walk"):
     current_batch = min(batch_size, n_steps - i)
     
-    # Generate all random steps at once
     steps = np.random.randint(0, 2, size=(current_batch, 5), dtype=np.int8) * 2 - 1
     
-    # Use JIT-compiled function for the hot loop
     x, y, r, g, b = random_walk(canvas, x, y, r, g, b, steps, width, height)
 
-# Save image
 print(f"Saving to {args.output}...")
 Image.fromarray(canvas).save(args.output)
 print("Done!")
