@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 import instructor
 
 OPENROUTER_API_KEY = (
-    "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"
+    "xxx-yyy"
 )
 
 client = instructor.from_provider(
